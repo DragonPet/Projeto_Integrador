@@ -1,6 +1,6 @@
-# Projeto_Integrador
+# Projeto Integrador
 
-Código desenvolvido no âmbito da UC Projeto Integrador
+Código desenvolvido no estágio curricular, no âmbito da UC Projeto Integrador
 
 Este repositório contém
   - Arduino.ino - Ficheiro correspondente ao programa desenvolvido para o Arduino UNO
