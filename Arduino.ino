@@ -64,18 +64,24 @@ int c_maq=0, c_vent=0, c_comp=0, c_bomb=0, c_inef=0, c_fuga=0;
 void setup(){
   // Abre o serial USB
   Serial.begin(9600);
-  while(!Serial){}
+  while(!Serial){
+    ;
+  }
+  
   // Abre as comunicações com o Esp
   if (Ativar_Esp){
     espSerial.begin(9600);
     while(!espSerial){}
   }
+  
   // Inicialização de pinos
   pinMode(corr_bomb_1, INPUT);
   pinMode(corr_comp_1, INPUT);
   pinMode(corr_vent_1, INPUT);
+  
   // Inicialização dos sensores de Temperatura
   sensors.begin();
+  
   // Delay Inicial
   unsigned long restante;
   Serial.println("Delay Inicial...");
@@ -193,6 +199,7 @@ void check(float vent_1, float comp_1, float bomb_1, float cond_1, float cond_2,
   Avarias();
   return;
 }
+
 // Verifica corrente do Ventilador
 void checkVent(float vent_1){
   if(vent_1 <= Vent_Corr_Min) {
@@ -204,6 +211,7 @@ void checkVent(float vent_1){
   }
   return;
 }
+
 // Verifica Corrente da Bomba
 void checkBomb(float bomb_1){
   if (bomb_1 <= Bomb_Corr_Min){
@@ -215,6 +223,7 @@ void checkBomb(float bomb_1){
   }
   return;
 }
+
 // Verifica Corrente do Compressor
 void checkComp(float comp_1){
   if(comp_1 <= Comp_Corr_Min){
@@ -226,6 +235,7 @@ void checkComp(float comp_1){
   }
   return;
 }
+
 // Verifica Temperatura do Condensador
 void checkCond(float cond_1, float cond_2){
   float T_Dif = cond_1 - cond_2;
@@ -237,6 +247,7 @@ void checkCond(float cond_1, float cond_2){
   }else{ 
       Cond[0] = 0;
   }
+  
   // Limites da temperatura do condensador no fim
   if(cond_2 < Cond_2_Temp_Min){
       Cond[1] = -1;
@@ -245,6 +256,7 @@ void checkCond(float cond_1, float cond_2){
   }else{
       Cond[1] = 0;
   }
+  
   // Diferença entre temperaturas dos termometros dos condensadores
   if (T_Dif < Cond_Dif_Aviso){
       if (T_Dif < Cond_Dif_Min){
@@ -257,6 +269,7 @@ void checkCond(float cond_1, float cond_2){
   }
   return;
 }
+
 // Verifica Temperatura da Água
 void checkAgua(float agua_1){
   if(agua_1 <= Agua_Temp_Min){
@@ -268,6 +281,7 @@ void checkAgua(float agua_1){
   }
   return;
 }
+
 // Verifica Temperatura Ambiente (não utilizado)
 void checkAmbi(float ambi_1){
   if(ambi_1 > Ambi_Temp_Ins){
@@ -289,6 +303,7 @@ void  espLeituras(float cond_1, float cond_2, float agua_1, float ambi_1, float 
   espSerial.println(vent_1);
   espSerial.println(bomb_1);
   espSerial.println(comp_1);
+  
   espSerial.println(maq_obstruida);
   espSerial.println(vent_queimado);
   espSerial.println(comp_queimado);
@@ -481,6 +496,7 @@ void Avarias(){
       c_maq = 0;
       maq_obstruida = false;
   }
+  
   // Ventilador_Queimado ----------------------------------------------------
   if(Cond[2]==-1 && Vent==-1){
       c_vent += 1;
@@ -491,6 +507,7 @@ void Avarias(){
       c_vent = 0; 
       vent_queimado = false;    
   }
+  
   // Compressor_Queimado ----------------------------------------------------
   if(Cond[2]==-1 && Comp==-1){
       c_comp += 1;
@@ -501,6 +518,7 @@ void Avarias(){
       c_comp = 0;
       comp_queimado = false;    
   }
+  
   // Bomba Queimada ----------------------------------------------------------
   if(Agua!=0 && Bomb==-1){
       c_bomb += 1;
@@ -512,6 +530,7 @@ void Avarias(){
     c_bomb = 0;
     bomb_avariada = false;
   }
+  
   // Ineficiência da Máquina ------------------------------------------------
   if (Agua==1 && Vent==0 && Comp==0 && Bomb==0){
       c_inef += 1;
@@ -523,6 +542,7 @@ void Avarias(){
       c_inef = 0;
       maq_ineficiente = false;
   }
+  
   // Fuga na máquina --------------------------------------------------------
   if (false){
     c_fuga += 1;
