@@ -6,8 +6,19 @@ const char* ssid      = "NOME_DA_REDE";
 const char* password  = "PASSWORD";
 
 // Declaração de variáveis de leitura
-float cond_1, cond_2, agua_1, ambi_1, vent_1, bomb_1, comp_1;
-bool maq_obstruida, vent_queimado, comp_queimado, bomb_avariada, maq_ineficiente, maq_fuga;
+float cond_1 = 0;
+float cond_2 = 0;
+float agua_1 = 0;
+float ambi_1 = 0;
+float vent_1 = 0;
+float bomb_1 = 0;
+float comp_1 = 0;;
+bool maq_obstruida = false;
+bool vent_queimado = false;
+bool comp_queimado = false;
+bool bomb_avariada = false;
+bool maq_ineficiente = false;
+bool maq_fuga = false;
 
 // Configurações da página html
 String header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
@@ -18,9 +29,6 @@ WiFiServer server(80);
 String Request = "";
 
 void setup(){
-  cond_1=cond_2=agua_1=ambi_1=vent_1=bomb_1=comp_1=0;
-  maq_obstruida=vent_queimado=comp_queimado=bomb_avariada=maq_ineficiente=maq_fuga=false;
-  
   // Abre o serial com o arduino/USB
   Serial.begin(9600);
   while(!Serial){
