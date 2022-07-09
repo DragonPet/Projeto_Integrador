@@ -61,6 +61,7 @@ int Bomb=0, Vent=0, Comp=0, Agua=0, Ambi=0, Cond[3]={0,0,0};
 
 // Variáveis de deteção de avarias
 bool maq_obstruida=false, vent_queimado=false, comp_queimado=false, bomb_avariada=false, maq_ineficiente=false, maq_fuga=false;
+bool arranque=true;
 
 // Contadores de avarias consecutivas
 int c_maq=0, c_vent=0, c_comp=0, c_bomb=0, c_inef=0, c_fuga=0;
@@ -109,6 +110,11 @@ void setup(){
           Serial.read();
       break;
     }
+    // Se a temperatura da agua estiverem abaixo do seu valor máximo, o sistema de deteção inicia
+    sensors.requestTemperatures();
+    float agua = sensors.getTempC(sensor_agua);
+    if (agua < Agua_Temp_Max)
+      break;
     delay(100);
   }
   Serial.println("Configuração completa");
@@ -118,7 +124,7 @@ void setup(){
 }
 
 void loop(){
-  // Leitura de Temperaturas  
+  // Leitura de Temperaturas
   sensors.requestTemperatures();
   float cond_1 = sensors.getTempC(sensor_cond1);
   float cond_2 = sensors.getTempC(sensor_cond2);
@@ -164,9 +170,9 @@ void leCorrentes(float* vent, float* bomb, float* comp){
         float bomb_1 = analogRead(corr_bomb_1);
         float comp_1 = analogRead(corr_comp_1);
 
-        vent_1 = (2.5 - (vent_1 *(5.0/1024.0)))/0.185;
-        bomb_1 = (2.5 - (bomb_1 *(5.0/1024.0)))/0.185;
-        comp_1 = (2.5 - (comp_1 *(5.0/1024.0)))/0.185;
+        vent_1 = ((vent_1 *(5.0/1024.0))-2.5)/0.185;
+        bomb_1 = ((bomb_1 *(5.0/1024.0))-2.5)/0.185;
+        comp_1 = ((comp_1 *(5.0/1024.0))-2.5)/0.185;
         
         soma_vent += sq(vent_1);
         soma_bomb += sq(bomb_1);
