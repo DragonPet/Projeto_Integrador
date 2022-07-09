@@ -1,20 +1,21 @@
-#include <OneWire.h>            // Sensor de Temperatura
-#include <DallasTemperature.h>  // Sensor de Temperatura
-#include <SoftwareSerial.h>     // Serial com o Esp
+#include <OneWire.h>                  // Biblioteca utilizada para o Sensor de Temperatura
+#include <DallasTemperature.h>        // Biblioteca utilizada para o Sensor de Temperatura
+#include <SoftwareSerial.h>           // Biblioteca utilizada para comunicação Serial com o Esp
 
-#define Ativar_Esp          false   // Ativa a comunicação com o Esp8266 para ligação ao servidor
-#define delay_Inicial       60000
-#define corr_tempo_leitura  10000
-#define Limite_Avarias      5
-#define delay_Amostra       10000
+#define Ativar_Esp          false     // (=true) Ativa a comunicação com o Esp8266 para ligação ao servidor
+#define delay_Inicial       60000     // (ms) Corresponde ao delay inicial para iniciar o sistema
+#define corr_tempo_leitura  10000     // (ms) Corresponde ao tempo de leitura das correntes
+#define Limite_Avarias      5         // Corresponde ao número de avarias consecutivas detetadas para gerar um alerta
+#define delay_Amostra       10000     // (ms) Corresponde ao delay entre a leitura da próxima amostra
 
 // Inicialização de Pinos
-byte corr_vent_1 = A0;               // Define o pino analógico utilizado pelo sensor de corrente no ventilador
-byte corr_bomb_1 = A4;               // Define o pino analógico utilizado pelo sensor de corrente na bomba
-byte corr_comp_1 = A2;               // Define o pino analógico utilizado pelo sensor de corrente no compressor
-byte sensors_pin =  2;               // Define o pino digital utilizado pelos sensores de temperatura
+byte corr_vent_1 = A0;                // Define o pino analógico utilizado pelo sensor de corrente no ventilador
+byte corr_bomb_1 = A4;                // Define o pino analógico utilizado pelo sensor de corrente na bomba
+byte corr_comp_1 = A2;                // Define o pino analógico utilizado pelo sensor de corrente no compressor
+byte sensors_pin =  2;                // Define o pino digital utilizado pelos sensores de temperatura
 
 // Seleciona os sensores de temperatura
+// Os endereços abaixo são determinados através de um programa auxiliar
 uint8_t sensor_cond1[8] = {0x28, 0x88, 0xF0, 0x76, 0xE0, 0x01, 0x3C, 0x4C};
 uint8_t sensor_ambi[8]  = {0x28, 0x53, 0xA3, 0x01, 0x00, 0x00, 0x00, 0x9B};
 uint8_t sensor_cond2[8] = {0x28, 0x29, 0x00, 0x76, 0xE0, 0x01, 0x3C, 0x81};
@@ -28,21 +29,21 @@ DallasTemperature sensors(&wire_sensor);
 SoftwareSerial espSerial(5, 6);
 
 // Inicialização de Limites
-int Vent_Corr_Max   = 370;        // Define o valor máximo para a corrente no ventilador
-int Vent_Corr_Min   = 250;        // Define o valor mínimo para a corrente no ventilador
-int Bomb_Corr_Max   = 520;        // Define o valor máximo para a corrente na bomba (Todas)
-int Bomb_Corr_Min   = 180;        // Define o valor mínimo para a corrente na bomba (Todas)
-int Comp_Corr_Max   = 4500;       // Define o valor máximo para a corrente no compressor
-int Comp_Corr_Min   = 3000;       // Define o valor mínimo para a corrente no compressor
-int Cond_1_Temp_Max = 75;         // Define o valor máximo para a temperatura na entrada do condensador
-int Cond_1_Temp_Min = 0;          // Define o valor mínimo para a temperatura na entrada do condensador (NAO É NECESSÁRIO)
-int Cond_2_Temp_Max = 55;         // Define o valor máximo para a temperatura na saída do condensador
-int Cond_2_Temp_Min = 0;          // Define o valor mínimo para a temperatura na saída do condensador 
-int Cond_Dif_Min    = 5;          // Define o valor mínimo da diferença da temperatura entre a entrada e a saída do condensador
-int Cond_Dif_Aviso  = 10;         // Define o valor mínimo da diferença da temperatura entre a entrada e a saída do condensador para aviso
-int Agua_Temp_Max   = 1;          // Define o valor máximo para a temperatura na água
-int Agua_Temp_Min   = -1;         // Define o valor mínimo para a temperatura na água
-int Ambi_Temp_Ins   = 25;         // Define o valor normal da temperatura ambiente
+int Vent_Corr_Max   = 270;            // Define o valor máximo para a corrente no ventilador
+int Vent_Corr_Min   = 180;            // Define o valor mínimo para a corrente no ventilador
+int Bomb_Corr_Max   = 470;            // Define o valor máximo para a corrente na bomba
+int Bomb_Corr_Min   = 180;            // Define o valor mínimo para a corrente na bomba
+int Comp_Corr_Max   = 4500;           // Define o valor máximo para a corrente no compressor
+int Comp_Corr_Min   = 2000;           // Define o valor mínimo para a corrente no compressor
+int Cond_1_Temp_Max = 75;             // Define o valor máximo para a temperatura na entrada do condensador
+int Cond_1_Temp_Min = 0;              // Define o valor mínimo para a temperatura na entrada do condensador (NAO É NECESSÁRIO)
+int Cond_2_Temp_Max = 55;             // Define o valor máximo para a temperatura na saída do condensador
+int Cond_2_Temp_Min = 0;              // Define o valor mínimo para a temperatura na saída do condensador 
+int Cond_Dif_Min    = 5;              // Define o valor mínimo da diferença da temperatura entre a entrada e a saída do condensador
+int Cond_Dif_Aviso  = 10;             // Define o valor mínimo da diferença da temperatura entre a entrada e a saída do condensador para aviso
+int Agua_Temp_Max   = 1;              // Define o valor máximo para a temperatura na água
+int Agua_Temp_Min   = -1;             // Define o valor mínimo para a temperatura na água
+int Ambi_Temp_Ins   = 20;             // Define o valor normal da temperatura ambiente
 
 // Inicialização das Variaveis de Controlo //
 /* 
@@ -54,12 +55,16 @@ int Ambi_Temp_Ins   = 25;         // Define o valor normal da temperatura ambien
   Cond[2]:
     0 - OK
     1 - Aviso
-    2 - Arranque
     -1 - Abaixo do limite
 */
 int Bomb=0, Vent=0, Comp=0, Agua=0, Ambi=0, Cond[3]={0,0,0};
+
+// Variáveis de deteção de avarias
 bool maq_obstruida=false, vent_queimado=false, comp_queimado=false, bomb_avariada=false, maq_ineficiente=false, maq_fuga=false;
+
+// Contadores de avarias consecutivas
 int c_maq=0, c_vent=0, c_comp=0, c_bomb=0, c_inef=0, c_fuga=0;
+
 
 void setup(){
   // Abre o serial USB
@@ -84,6 +89,7 @@ void setup(){
   
   // Delay Inicial
   unsigned long restante;
+  // Escreve no serial "Delay Inicial...\n --h--min--s
   Serial.println("Delay Inicial...");
   Serial.print(delay_Inicial/1000/3600);
   Serial.print("h");
@@ -93,9 +99,10 @@ void setup(){
   restante = restante - (restante/60)*60;
   Serial.print(restante);
   Serial.println("s");
-  
+
+  // Aplica o delay, que pode ser interrompido pelo "pressionar tecla enter"
   unsigned long Inicial = millis();
-  Serial.println("Press any key to continue...");
+  Serial.println("Pressione Enter para continuar...");
   while((millis()-Inicial) < delay_Inicial){
     if (Serial.available()){
       while (Serial.available())
@@ -149,8 +156,7 @@ void loop(){
 // Lê as correntes de todos os sensores de corrente
 void leCorrentes(float* vent, float* bomb, float* comp){
     int i = 0;
-    float soma_vent, soma_bomb, soma_comp;
-    soma_vent = soma_bomb = soma_comp = 0;
+    float soma_vent = 0, soma_bomb = 0, soma_comp = 0;
 
     uint32_t tempo = millis();
     while((millis()-tempo) < corr_tempo_leitura){
@@ -165,8 +171,8 @@ void leCorrentes(float* vent, float* bomb, float* comp){
         soma_vent += sq(vent_1);
         soma_bomb += sq(bomb_1);
         soma_comp += sq(comp_1);
+        
         i+=1;
-
         delay(1);
     }
     
@@ -290,6 +296,78 @@ void checkAmbi(float ambi_1){
       Ambi = 0;
   }
   return;
+}
+
+// Calcula a existência de avarias
+void Avarias(){
+  // Maquina_Obstruida ----------------------------------------------------
+  if(Cond[2]==-1 && Vent==0 && Bomb==0){
+      c_maq += 1;
+      if(c_maq >= Limite_Avarias){ // limite de erros seguidos atingidos
+         maq_obstruida = true; //ALERTAR maquina obstruida
+      }
+  }else{
+      c_maq = 0;
+      maq_obstruida = false;
+  }
+  
+  // Ventilador_Queimado ----------------------------------------------------
+  if(Cond[2]==-1 && Vent==-1){
+      c_vent += 1;
+      if(c_vent >= Limite_Avarias){ // limite de erros seguidos atingidos
+         vent_queimado = true; //ALERTAR ventilador queimado
+      }
+  }else{
+      c_vent = 0; 
+      vent_queimado = false;    
+  }
+  
+  // Compressor_Queimado ----------------------------------------------------
+  if(Cond[2]==-1 && Comp==-1){
+      c_comp += 1;
+      if(c_comp >= Limite_Avarias){ // limite de erros seguidos atingidos
+         comp_queimado = true; //ALERTAR compressor queimado
+      }
+  }else{
+      c_comp = 0;
+      comp_queimado = false;    
+  }
+  
+  // Bomba Queimada ----------------------------------------------------------
+  if(Agua!=0 && Bomb==-1){
+      c_bomb += 1;
+      if(c_bomb >= Limite_Avarias){
+          bomb_avariada = true; //ALERTAR bomba avariada
+      }
+  }
+  else{
+    c_bomb = 0;
+    bomb_avariada = false;
+  }
+  
+  // Ineficiência da Máquina ------------------------------------------------
+  if (Agua==1 && Vent==0 && Comp==0 && Bomb==0){
+      c_inef += 1;
+      if (c_inef >= Limite_Avarias){
+        maq_ineficiente = true; // ALERTAR ineficiência da máquina (possível acumulação de lixo)
+      }
+  }
+  else{
+      c_inef = 0;
+      maq_ineficiente = false;
+  }
+  
+  // Fuga na máquina --------------------------------------------------------
+  if (false){
+    c_fuga += 1;
+    if (c_fuga >= Limite_Avarias){
+      maq_fuga = true; // ALERTAR fuga na máquina
+    }
+  }
+  else{
+    c_fuga = 0;
+    maq_fuga = false;
+  }
 }
 
 /******************************** Escritas no Esp *********************************/
@@ -482,76 +560,4 @@ void serialExcel(float vent_1, float comp_1, float bomb_1, float cond_1, float c
   Serial.print(F("Ambiente: "));
   Serial.println(ambi_1);
   return;
-}
-
-// Calcula a existência de avarias
-void Avarias(){
-  // Maquina_Obstruida ----------------------------------------------------
-  if(Cond[2]==-1 && Vent==0 && Bomb==0){
-      c_maq += 1;
-      if(c_maq >= Limite_Avarias){ // limite de erros seguidos atingidos
-         maq_obstruida = true; //ALERTAR maquina obstruida
-      }
-  }else{
-      c_maq = 0;
-      maq_obstruida = false;
-  }
-  
-  // Ventilador_Queimado ----------------------------------------------------
-  if(Cond[2]==-1 && Vent==-1){
-      c_vent += 1;
-      if(c_vent >= Limite_Avarias){ // limite de erros seguidos atingidos
-         vent_queimado = true; //ALERTAR ventilador queimado
-      }
-  }else{
-      c_vent = 0; 
-      vent_queimado = false;    
-  }
-  
-  // Compressor_Queimado ----------------------------------------------------
-  if(Cond[2]==-1 && Comp==-1){
-      c_comp += 1;
-      if(c_comp >= Limite_Avarias){ // limite de erros seguidos atingidos
-         comp_queimado = true; //ALERTAR compressor queimado
-      }
-  }else{
-      c_comp = 0;
-      comp_queimado = false;    
-  }
-  
-  // Bomba Queimada ----------------------------------------------------------
-  if(Agua!=0 && Bomb==-1){
-      c_bomb += 1;
-      if(c_bomb >= Limite_Avarias){
-          bomb_avariada = true; //ALERTAR bomba avariada
-      }
-  }
-  else{
-    c_bomb = 0;
-    bomb_avariada = false;
-  }
-  
-  // Ineficiência da Máquina ------------------------------------------------
-  if (Agua==1 && Vent==0 && Comp==0 && Bomb==0){
-      c_inef += 1;
-      if (c_inef >= Limite_Avarias){
-        maq_ineficiente = true; // ALERTAR ineficiência da máquina (possível acumulação de lixo)
-      }
-  }
-  else{
-      c_inef = 0;
-      maq_ineficiente = false;
-  }
-  
-  // Fuga na máquina --------------------------------------------------------
-  if (false){
-    c_fuga += 1;
-    if (c_fuga >= Limite_Avarias){
-      maq_fuga = true; // ALERTAR fuga na máquina
-    }
-  }
-  else{
-    c_fuga = 0;
-    maq_fuga = false;
-  }
 }
