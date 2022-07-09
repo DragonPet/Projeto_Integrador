@@ -1,5 +1,5 @@
 #include <ESP8266WiFi.h>  // Biblioteca do Esp
-#include "projeto.h"
+#include "projeto.h"      // Este ficheiro inclui o código da página web
 
 // Configurações WiFi
 const char* ssid      = "NOME_DA_REDE";
@@ -12,7 +12,7 @@ float agua_1 = 0;
 float ambi_1 = 0;
 float vent_1 = 0;
 float bomb_1 = 0;
-float comp_1 = 0;;
+float comp_1 = 0;
 bool maq_obstruida = false;
 bool vent_queimado = false;
 bool comp_queimado = false;
@@ -43,6 +43,8 @@ void setup(){
     Serial.print(".");
   }
   Serial.println("WiFi ligado");
+
+  // O website fica disponível no IP ligado
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
