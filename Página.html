@@ -13,10 +13,10 @@
                 var ajaxRequest = null;
                 if (window.XMLHttpRequest){
                     ajaxRequest =new XMLHttpRequest();
-                } else{
+                } else {
                     ajaxRequest =new ActiveXObject('Microsoft.XMLHTTP');
                 }
-                               
+                
                 function ajaxLoad(ajaxURL){
                     if(!ajaxRequest){ 
                         alert('AJAX is not supported.'); 
@@ -42,48 +42,47 @@
                             bomb_avariada = tmpArray[10];
                             maq_ineficiente = tmpArray[11];
                             fuga = tmpArray[12];
+
+                            if(bomb_avariada || maq_obstruida || vent_queimado || comp_queimado || maq_ineficiente || fuga)
+                                document.getElementById('titulo_avarias').innerHTML = 'Alertas de Avarias:';
+                            else
+                                document.getElementById('titulo_avarias').innerHTML = '';
+            
+                            if(bomb_avariada)
+                                document.getElementById('bomba_avariada').innerHTML = 'Bomba Avariada';
+                            else
+                                document.getElementById('bomba_avariada').innerHTML = '';
+        
+                            if(maq_obstruida)
+                                document.getElementById('obstruida').innerHTML = 'Máquina Obstruida';
+                            else
+                                document.getElementById('obstruida').innerHTML = '';
+        
+                            if(vent_queimado)
+                                document.getElementById('ventilador').innerHTML = 'Ventilador Avariado';
+                            else
+                                document.getElementById('ventilador').innerHTML = '';
+        
+                            if(comp_queimado)
+                                document.getElementById('compressor').innerHTML = 'Compressor Avariado';
+                            else
+                                document.getElementById('compressor').innerHTML = '';
+                    
+                            if(maq_ineficiente)
+                                document.getElementById('ineficiencia').innerHTML = 'Máquina com Ineficiencia no Funcionamento';
+                            else
+                                document.getElementById('ineficiencia').innerHTML = '';
+        
+                            if(fuga)
+                                document.getElementById('fuga').innerHTML = 'Fuga no Compressor';
+                            else
+                                document.getElementById('fuga').innerHTML = '';
                         }
                     }
                     ajaxRequest.send();
                 }
-              
+
                 var myVar1 = setInterval(updateValores, 5000);
-        
-                bomb_avariada = true;
-                if(bomb_avariada || maq_obstruida || vent_queimado || comp_queimado || maq_ineficiente || fuga)
-                    document.getElementById('titulo_avarias').innerHTML = 'Alertas de Avarias:';
-                else
-                    document.getElementById('titulo_avarias').innerHTML = '';
-            
-                if(bomb_avariada)
-                    document.getElementById('bomba_avariada').innerHTML = 'Bomba Avariada';
-                else
-                    document.getElementById('bomba_avariada').innerHTML = '';
-        
-                if(maq_obstruida)
-                    document.getElementById('obstruida').innerHTML = 'Máquina Obstruida';
-                else
-                    document.getElementById('obstruida').innerHTML = '';
-        
-                if(vent_queimado)
-                    document.getElementById('ventilador').innerHTML = 'Ventilador Avariado';
-                else
-                    document.getElementById('ventilador').innerHTML = '';
-        
-                if(comp_queimado)
-                    document.getElementById('compressor').innerHTML = 'Compressor Avariado';
-                else
-                    document.getElementById('compressor').innerHTML = '';
-                    
-                if(maq_ineficiente)
-                    document.getElementById('ineficiencia').innerHTML = 'Maquina com Ineficiencia no Funcionamento';
-                else
-                    document.getElementById('ineficiencia').innerHTML = '';
-        
-                if(fuga)
-                    document.getElementById('fuga').innerHTML = 'Fuga no Compressor';
-                else
-                    document.getElementById('fuga').innerHTML = '';
             </script>
 
     <title>Projeto Integrador</title>
@@ -247,7 +246,7 @@
                         <p>
                             <span>Condensador Entrada: </span>
                             <span id='Cond_1'>NaN</span> 
-                            <span>ºC</span>
+                            <span> ºC</span>
                         </p>
                     </div>
     
@@ -255,7 +254,7 @@
                         <p>
                             <span>Condensador Saída: </span>
                             <span id='Cond_2'>NaN</span>
-                            <span>ºC</span>
+                            <span> ºC</span>
                         </p>
                     </div>
 
@@ -263,7 +262,7 @@
                         <p>
                             <span>Água: </span>
                             <span id='Agua_1'>NaN</span>
-                            <span>ºC</span>
+                            <span> ºC</span>
                         </p>
                     </div>
 
@@ -271,7 +270,7 @@
                         <p>
                             <span>Ambiente: </span>
                             <span id='Ambi_1'>NaN</span>
-                            <span>ºC</span>
+                            <span> ºC</span>
                         </p>
                     </div>
                 </div>
@@ -289,21 +288,21 @@
                         <p>
                             <span>Bomba: </span>      
                             <span id='Bomb_1'>NaN</span>
-                            <span>A</span> 
+                            <span> A</span> 
                         </p>
                     </div>
                     <div>
                         <p>
                             <span>Ventilador: </span>
                             <span id='Vent_1'>NaN</span>
-                            <span>A</span> 
+                            <span> A</span> 
                         </p>
                     </div>
                     <div>
                         <p>
                             <span>Compressor: </span>
                             <span id='Comp_1'>NaN</span>
-                            <span>A</span>
+                            <span> A</span>
                         </p>
                     </div>
                 </div>
